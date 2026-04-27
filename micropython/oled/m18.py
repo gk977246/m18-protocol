@@ -7,7 +7,7 @@ import utime
 _NIBBLE_REV = (0x0, 0x8, 0x4, 0xC, 0x2, 0xA, 0x6, 0xE, 0x1, 0x9, 0x5, 0xD, 0x3, 0xB, 0x7, 0xF)
 
 class M18:
-    def __init__(self, tx_pin=17, rx_pin=16, baudrate=4800, debug=True):
+    def __init__(self, tx_pin=20, rx_pin=21, baudrate=4800, debug=True):
         self.baudrate = baudrate
         self.tx_pin = tx_pin
         self.rx_pin = rx_pin

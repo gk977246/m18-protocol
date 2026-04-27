@@ -127,7 +127,7 @@ class App:
         for i in range(min(5, len(cells))):
             v = cells[i]
             status = "!" if v < 3000 else ""
-            self.oled.text(f"C{i+1}:{v}{status}", 0, y, 1)
+            self.oled.text(f"C{i+1}:{v}{status}mV", 0, y, 1)
             y += 10
         if len(cells) > 5:
             self.oled.text(f"+{len(cells)-5} more", 0, 54, 1)
