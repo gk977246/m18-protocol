@@ -14,8 +14,8 @@ Includes Mp1584 (buck-module), level shifter, and Spud Isolator
 
 ![PCB](docs/m18.png)
 
-![CYD2USB](docs/cyd.png)
+![CYD2USB](docs/Cyd.png)
 
-![C3oled](docs/oled.png)
+![C3oled](docs/Oled.png)
 
 
