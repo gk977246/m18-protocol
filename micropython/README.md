@@ -12,6 +12,9 @@ I made a test pcb with Esp32C3-mini, Oled or Spi-display, and uart connections f
 
 Includes Mp1584 (buck-module), level-shifter, and Spud-Isolator
 
+## Dont use Cyd with buck converter(the dumb charge counter increases) -- power it with usb and use read-button
+
+
 ![PCB](docs/m18.png)
 
 ![CYD2USB](docs/Cyd.png)
