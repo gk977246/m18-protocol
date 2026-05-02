@@ -74,7 +74,7 @@ class App:
                 self.last_button_time = now
                 # Wait for release to prevent repeat
                 while self.btn.value() == 0:
-                    time.sleep_ms(10)
+                    time.sleep_ms(1)
                 return True
         return False
 
@@ -109,19 +109,19 @@ class App:
         #self.disp.text("NEXT", 255, 215, st7789.RED, scale=1)
         
         # Screen Title
-        titles = ["PACK OVERVIEW", "MILWAUKEE", "USAGE HISTORY"]
+        titles = ["PACK OVERVIEW", "CELLS 1-5", "AMPS HISTORY"]
         self.disp.text(titles[self.screen_idx], 10, 5, st7789.RED, scale=2)
 
     def update_data(self):
         """Fetch data from M18 BMS"""
         print("Reading M18...")
-        self.disp.text("Reading...", 10, 20, st7789.YELLOW, scale=1)
+        self.disp.text("Reading...", 10, 30, st7789.YELLOW, scale=2)
         try:
             self.health = self.m18.get_health_lcd()
             self.update_display()
         except Exception as e:
             print("Error:", e)
-            self.disp.text("Error Reading!", 10, 20, st7789.RED, scale=1)
+            self.disp.text("Error Reading!", 10, 30, st7789.RED, scale=2)
 
     def update_display(self):
         """Render current screen index"""
@@ -133,30 +133,31 @@ class App:
         self.disp.fill_rect(0, 20, 240, 175, st7789.BLACK)
         
         if self.screen_idx == 0:
-            self.draw_screen_cells(h)
-        elif self.screen_idx == 1:
             self.draw_screen_overview(h)
+        elif self.screen_idx == 1:
+            self.draw_screen_cells(h)
         elif self.screen_idx == 2:
             self.draw_screen_usage(h)
 
     def draw_screen_overview(self, h):
         # Big Voltage
-        self.disp.text("{:.2f} V".format(h['total_v']), 10, 30, st7789.GREEN, scale=1)
+        self.disp.text("{:.2f} V".format(h['total_v']), 10, 30, st7789.GREEN, scale=2)
         
         # Imbalance
-        self.disp.text("Imbalance: {} mV".format(h['imbalance']), 10, 70, st7789.CYAN, scale=1)
+        self.disp.text("Diff: {} mV".format(h['imbalance']), 10, 60, st7789.CYAN, scale=2)
         
         # Capacity
-        self.disp.text("Total Discharged: {:.1f} Ah".format(h['total_ah']), 10, 90, st7789.WHITE, scale=1)
+        self.disp.text("AmpHrs:{:.1f}Ah".format(h['total_ah']), 10, 90, st7789.WHITE, scale=2)
         
         # Days & Cycles
-        self.disp.text("Days Active: {}".format(h['days_since_first']), 10, 110, st7789.CYAN, scale=1)
-        self.disp.text("Years: {:.1f}".format(h['years']), 160, 110, st7789.CYAN, scale=1)
-        self.disp.text("Total Charges: {}".format(h['charge_total']), 10, 130, st7789.WHITE, scale=1)
+        self.disp.text("D:{}".format(h['days_since_first']), 10, 120, st7789.CYAN, scale=2)
+        self.disp.text("Y:{:.1f}".format(h['years']), 140, 120, st7789.CYAN, scale=2)
+        self.disp.text("Charges:", 10, 155, st7789.WHITE, scale=2)
+        self.disp.text("Total  :{}".format(h['charge_total']), 10, 180, st7789.WHITE, scale=2)
         
         # Redlink & LowV
-        self.disp.text("Milwaukee Charges: {}".format(h['redlink_count']), 10, 150, st7789.CYAN, scale=1)
-        self.disp.text("LowV Chg: {}".format(h['lowv_charge_count']), 10, 170, st7789.ORANGE, scale=1)
+        self.disp.text("Redlink:{}".format(h['redlink_count']), 10, 200, st7789.CYAN, scale=2)
+        self.disp.text("LowV   :{}".format(h['lowv_charge_count']), 10, 220, st7789.ORANGE, scale=2)
 
     def draw_screen_cells(self, h):
         cells = h['cells']
@@ -164,24 +165,24 @@ class App:
         
         y_start = 30
         for i, v in enumerate(cells):
-            y = y_start + (i * 30)
+            y = y_start + (i * 40)
             # Label
-            self.disp.text( "Cell {}: ".format(i+1), 10, y,st7789.WHITE, scale=1)
+            self.disp.text( "{}: ".format(i+1), 10, y,st7789.WHITE, scale=2)
             # Value
-            self.disp.text("{} mV".format(v), 80, y, colors[i], scale=1)
+            self.disp.text("{} mV".format(v), 40, y, colors[i], scale=2)
             
             # Mini Bar (3.0V to 4.2V range)
             min_v = 3000; max_v = 4200
             pct = max(0, min(100, (v - min_v) / (max_v - min_v) * 100))
-            draw_bar(self.disp, 10, y+12, 210, 8, pct, 100, colors[i], st7789.DK_GRAY)
+            draw_bar(self.disp, 10, y+18, 210, 8, pct, 100, colors[i], st7789.DK_GRAY)
             #draw_bar(self.disp, 10, y_pos+12, 200, 6, pct, 100, st7789.ORANGE, st7789.DK_GRAY)
     def draw_screen_usage(self, h):
         buckets = h['buckets'] # 20 buckets: 10-20A to 200-210A
         pcts = h['bucket_pct']
         total_sec = h['bucket_total_sec']
         
-        self.disp.text("Discharge Histogram (10-200A)", 10, 30, st7789.WHITE, scale=1)
-        self.disp.text("Total Time: {} min".format(total_sec//60), 10, 45, st7789.CYAN, scale=1)
+        #self.disp.text("Discharge Histogram (10-200A)", 10, 30, st7789.WHITE, scale=2)
+        self.disp.text("Time:{} min".format(total_sec//60), 10, 30, st7789.CYAN, scale=2)
         
         # Draw Histogram
         # We have 11 buckets. Let's show top 5 or all if they fit.
@@ -191,19 +192,19 @@ class App:
         indexed = list(enumerate(zip(buckets, pcts)))
         indexed.sort(key=lambda x: x[1][0], reverse=True)
         
-        y_pos = 65
+        y_pos = 60
         for i in range(min(6, len(indexed))):
             idx, (sec, pct) = indexed[i]
-            amp_label = "{}-{}A".format((idx+1)*10, (idx+2)*10)
+            amp_label = "{}-{}".format((idx+1)*10, (idx+2)*10)
             
             # Text
-            text = "{}: {}m ({}%)".format(amp_label, sec//60, pct)
-            self.disp.text(text, 10, y_pos, st7789.WHITE, scale=1)
+            text = "{}:{}m({}%)".format(amp_label, sec//60, pct)
+            self.disp.text(text, 3, y_pos, st7789.WHITE, scale=2)
             
             # Bar
-            draw_bar(self.disp, 10, y_pos+10, 200, 6, pct, 100, st7789.ORANGE, st7789.DK_GRAY)
+            draw_bar(self.disp, 3, y_pos+18, 200, 6, pct, 100, st7789.ORANGE, st7789.DK_GRAY)
             
-            y_pos += 25
+            y_pos += 30
 
 # ─── Main Loop ──────────────────────────────────────────────────────
 #try:
@@ -213,7 +214,7 @@ while True:
         # or just let the interrupt handler update state.
         # For stability, we just sleep. The touch handler updates the screen.
     #app.read_button()
-    time.sleep_ms(10) 
+    time.sleep_ms(10)
     app.handle_input()    
 #except KeyboardInterrupt:
 #    print("\nExiting...")
