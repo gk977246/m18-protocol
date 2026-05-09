@@ -62,7 +62,7 @@ class App:
         # UI State
         self.disp.clear(C_BLACK)
         self.draw_ui_frame()
-        self.update_data() # Initial read
+        #self.update_data() # Initial read
         
     def on_touch(self, x, y):
         """Handle touch interrupts. Note: X/Y might be swapped depending on calibration."""
